@@ -13,7 +13,7 @@
 using namespace std;
 
 namespace System3DL {
-    Figure LSystem3D(const ini::Configuration &configuration, const std::string &figureName, Matrix &V, bool transform = true, bool light = false);
+    Figure LSystem3D(const ini::Configuration &configuration, const std::string &figureName, Matrix &V, bool transform = true);
 };
 class Transformation{
 public:
@@ -25,7 +25,7 @@ public:
 
     static Matrix rotateZ(double angle);
 
-    static Matrix translate(const Vector3D &vec);
+    static Matrix translate(const Vector3D &vector);
 
     static Matrix eyePointTrans(const Vector3D &eyepoint);
 

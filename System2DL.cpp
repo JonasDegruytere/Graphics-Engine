@@ -5,36 +5,36 @@
 #include "System2DL.h"
 
 img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
-    const unsigned int size = configuration["General"]["size"].as_int_or_die();
-    std::vector<double> backgroundColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
-    img::Color BackgroundColorElement(backgroundColor[0]*255, backgroundColor[1]*255, backgroundColor[2]*255);
-    std::vector<double> lineColor = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
+    vector<double> lineColor = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
     Color LineColorElement(lineColor[0], lineColor[1], lineColor[2]);
-    std::string inputfile = configuration["2DLSystem"]["inputfile"].as_string_or_die();
+    string inputfile = configuration["2DLSystem"]["inputfile"].as_string_or_die();
+    const unsigned int size = configuration["General"]["size"].as_int_or_die();
+    vector<double> backgroundColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+    img::Color BackgroundColorElement(backgroundColor[0]*255, backgroundColor[1]*255, backgroundColor[2]*255);
 
-    std::string initiator;
-    double angle;
     double starting_angle;
-    std::map<char, bool> draw;
+    map<char, bool> draw;
+    string initiator;
+    double angle;
 
-    std::string stochastic;
+    string stochastic;
     LParser::LSystem2D l_system;
-    std::ifstream input_stream(inputfile);
+    ifstream input_stream(inputfile);
     input_stream >> l_system;
     input_stream.close();
-
-    const std::set<char> alphabet = l_system.get_alphabet();
-    initiator = l_system.get_initiator();
+    
     angle = l_system.get_angle();
     starting_angle = l_system.get_starting_angle();
-    const unsigned int iterations = l_system.get_nr_iterations();
-    std::map<char, std::string> replacements;
+    const set<char> alphabet = l_system.get_alphabet();
+    map<char, string> replacements;
     for (auto i: alphabet) {
         draw[i] = l_system.draw(i);
         replacements[i] = l_system.get_replacement(i);
     }
+    initiator = l_system.get_initiator();
+    const unsigned int iterations = l_system.get_nr_iterations();
     for (unsigned int i = 0; i < iterations; i++) {
-        std::string replacement;
+        string replacement;
         for (auto j: initiator) {
             if (j == '+') replacement += "+";
             else if (j == '-') replacement += "-";
@@ -45,48 +45,49 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
         initiator = replacement;
     }
 
-    Point2D cur_point;
-    cur_point.x = 0;
-    cur_point.y = 0;
-    double cur_dir = starting_angle;
+    double curDirection = starting_angle;
+    Point2D currentPoint;
+    currentPoint.x = 0;
+    currentPoint.y = 0;
     Lines2D lines;
-    Line2D new_line;
-    std::stack<Point2D> points_stack;
-    std::stack<double> dir_stack;
+    Line2D newLine;
+    stack<Point2D> pointsStack;
+    stack<double> dirStack;
     for (auto i: initiator) {
-        if (i == '+') cur_dir += angle;
-        else if (i == '-') cur_dir -= angle;
+        if (i == '+') curDirection += angle;
+        else if (i == '-') curDirection -= angle;
         else if (i == '(') {
-            points_stack.push(cur_point);
-            dir_stack.push(cur_dir);
-        } else if (i == ')') {
-            Point2D temp_point = points_stack.top();
-            points_stack.pop();
-            cur_point.x = temp_point.x;
-            cur_point.y = temp_point.y;
-
-            cur_dir = dir_stack.top();
-            dir_stack.pop();
-        } else {
-            Point2D new_point;
-            new_point.x = cur_point.x + cos((cur_dir * M_PI) / 180.0);
-            new_point.y = cur_point.y + sin((cur_dir * M_PI) / 180.0);
+            pointsStack.push(currentPoint);
+            dirStack.push(curDirection);
+        }
+        else if (i == ')') {
+            Point2D temp_point = pointsStack.top();
+            pointsStack.pop();
+            currentPoint.x = temp_point.x;
+            currentPoint.y = temp_point.y;
+            curDirection = dirStack.top();
+            dirStack.pop();
+        }
+        else {
+            Point2D newPoint;
+            newPoint.x = currentPoint.x + cos((curDirection * M_PI) / 180.0);
+            newPoint.y = currentPoint.y + sin((curDirection * M_PI) / 180.0);
             if (draw[i]) {
-                new_line.p1 = cur_point;
-                new_line.p2 = new_point;
-                new_line.color = LineColorElement;
-                lines.push_back(new_line);
+                newLine.p1 = currentPoint;
+                newLine.p2 = newPoint;
+                newLine.color = LineColorElement;
+                lines.push_back(newLine);
             }
-            cur_point = new_point;
+            currentPoint = newPoint;
         }
     }
     return DrawLines(lines, size, BackgroundColorElement);
 }
 
 img::EasyImage System2DL::DrawLines(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer) {
-    std::list<Point2D> points;
-    std::list<double> xPoints;
-    std::list<double> yPoints;
+    list<Point2D> points;
+    list<double> xPoints;
+    list<double> yPoints;
     for (auto &i: lines) {
         points.push_back(i.p1);
         points.push_back(i.p2);
@@ -96,14 +97,14 @@ img::EasyImage System2DL::DrawLines(Lines2D &lines, double size, img::Color back
         yPoints.push_back(i.y);
     }
 
-    double xMax = *std::max_element(xPoints.begin(), xPoints.end());
-    double xMin = *std::min_element(xPoints.begin(), xPoints.end());
-    double yMax = *std::max_element(yPoints.begin(), yPoints.end());
-    double yMin = *std::min_element(yPoints.begin(), yPoints.end());
+    double xMax = *max_element(xPoints.begin(), xPoints.end());
+    double xMin = *min_element(xPoints.begin(), xPoints.end());
+    double yMax = *max_element(yPoints.begin(), yPoints.end());
+    double yMin = *min_element(yPoints.begin(), yPoints.end());
     double xRange = xMax - xMin;
     double yRange = yMax - yMin;
-    double imageX = size * (xRange / std::max(xRange, yRange));
-    double imageY = size * (yRange / std::max(xRange, yRange));
+    double imageX = size * (xRange / max(xRange, yRange));
+    double imageY = size * (yRange / max(xRange, yRange));
 
     double d = 0.95 * (imageX / xRange);
     double DCx = d * ((xMax + xMin)/2.0);

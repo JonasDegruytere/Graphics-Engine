@@ -124,11 +124,11 @@ Matrix Transformation::rotateZ(double angle) {
     return Mz;
 }
 
-Matrix Transformation::translate(const Vector3D &vec) {
+Matrix Transformation::translate(const Vector3D &vector) {
     Matrix T;
-    T(4, 1) = vec.x;
-    T(4, 2) = vec.y;
-    T(4, 3) = vec.z;
+    T(4, 1) = vector.x;
+    T(4, 2) = vector.y;
+    T(4, 3) = vector.z;
     return T;
 }
 
@@ -154,39 +154,37 @@ void Transformation::applyTransformation(Figure &fig, const Matrix &M) {
     }
 }
 
-Figure System3DL::LSystem3D(const ini::Configuration &configuration, const string &figureName, Matrix &V, bool transform, bool light) {
+Figure System3DL::LSystem3D(const ini::Configuration &configuration, const string &figureName, Matrix &V, bool transform) {
+
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();;
     const string inputfile = configuration[figureName]["inputfile"].as_string_or_die();
-    vector<double> color;
-
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
     LParser::LSystem3D l_system;
     ifstream input_stream(inputfile);
     input_stream >> l_system;
     input_stream.close();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     const set<char> alphabet = l_system.get_alphabet();
-    string initiator = l_system.get_initiator();
     double angle = l_system.get_angle();
+    angle = (angle*M_PI)/180;
     const unsigned int iterations = l_system.get_nr_iterations();
-
+    string initiator = l_system.get_initiator();
     map<char, string> replacements;
     map<char, bool> draw;
     for (auto i: alphabet) {
         draw[i] = l_system.draw(i);
         replacements[i] = l_system.get_replacement(i);
     }
-
-    angle = (angle*M_PI)/180;
-
     Vector3D curPoint = Vector3D::point(0, 0, 0);
+    Figure fig;
+    fig.drawColor = Color(color[0],color[1],color[2]);
+    fig.points.push_back(curPoint);
+    int indexCounter = 0;
     Vector3D H = Vector3D::vector(1, 0, 0);
     Vector3D L = Vector3D::vector(0, 1, 0);
     Vector3D U = Vector3D::vector(0, 0, 1);
@@ -194,12 +192,6 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
     stack<Vector3D> HStack;
     stack<Vector3D> LStack;
     stack<Vector3D> UStack;
-
-    Figure fig;
-    fig.drawColor = Color(color[0],color[1],color[2]);
-    fig.points.push_back(curPoint);
-    int indexCounter = 0;
-
     for (unsigned int i = 0; i < iterations; i++) {
         string replacement;
         for (auto j: initiator) {
@@ -216,7 +208,6 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
         }
         initiator = replacement;
     }
-
     vector<Vector3D> toAdd;
     for (unsigned int k = 0; k < initiator.length(); k++) {
         char i = initiator[k];
@@ -357,16 +348,12 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
             }
         }
     }
-
     Matrix S = Transformation::scaleFigure(scale);
+    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
-
     if (transform) Transformation::applyTransformation(fig, F);
-
     return fig;
 }
