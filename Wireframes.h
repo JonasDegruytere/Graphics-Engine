@@ -25,25 +25,23 @@ Lines2D doProjectionConst(const Figures3D &figs);
 
 Figure createEyeFigure(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createCube(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createCube(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createTetrahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createTetrahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createOctahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createOctahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createIcosahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createIcosahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createDodecahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createDodecahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createSphere(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createSphere(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createCone(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createCone(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createCylinder(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createCylinder(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
-Figure createTorus(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
-
-Figure createBuckyBall(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light = false);
+Figure createTorus(const ini::Configuration &configuration, std::string &figureName, Matrix &V);
 
 namespace Lines3D {
     img::EasyImage wireframe(const ini::Configuration &configuration, bool zBuffer);

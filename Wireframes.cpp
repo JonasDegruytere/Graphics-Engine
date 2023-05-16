@@ -95,7 +95,7 @@ Figure createEyeFigure(const ini::Configuration &configuration, string &figureNa
     return fig;
 }
 
-Figure createCube(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createCube(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -118,7 +118,7 @@ Figure createCube(const ini::Configuration &configuration, string &figureName, M
     return fig;
 }
 
-Figure createTetrahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createTetrahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -141,7 +141,7 @@ Figure createTetrahedron(const ini::Configuration &configuration, string &figure
     return fig;
 }
 
-Figure createOctahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createOctahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -164,7 +164,7 @@ Figure createOctahedron(const ini::Configuration &configuration, string &figureN
     return fig;
 }
 
-Figure createIcosahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createIcosahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -187,7 +187,7 @@ Figure createIcosahedron(const ini::Configuration &configuration, string &figure
     return fig;
 }
 
-Figure createDodecahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createDodecahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -210,7 +210,7 @@ Figure createDodecahedron(const ini::Configuration &configuration, string &figur
     return fig;
 }
 
-Figure createSphere(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createSphere(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -238,7 +238,7 @@ Figure createSphere(const ini::Configuration &configuration, string &figureName,
     return fig;
 }
 
-Figure createCone(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createCone(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -275,7 +275,7 @@ Figure createCone(const ini::Configuration &configuration, string &figureName, M
     return fig;
 }
 
-Figure createCylinder(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createCylinder(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
@@ -319,7 +319,7 @@ Figure createCylinder(const ini::Configuration &configuration, string &figureNam
     return fig;
 }
 
-Figure createTorus(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
+Figure createTorus(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
