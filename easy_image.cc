@@ -385,20 +385,6 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
 }
 void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const Vector3D &b, const Vector3D &c, double d, double dx, double dy, Color &lights)
 {
-    double ambientRed = 0;
-    double ambientGreen = 0;
-    double ambientBlue = 0;
-    /*
-    for (auto curLight : lights) {
-        ambientRed += curLight->ambientLight.red * ambientReflection.red;
-        ambientGreen += curLight->ambientLight.green * ambientReflection.green;
-        ambientBlue += curLight->ambientLight.blue * ambientReflection.blue;
-
-        if (ambientRed > 1) ambientRed = 1;
-        if (ambientGreen > 1) ambientGreen = 1;
-        if (ambientBlue > 1) ambientBlue = 1;
-    }
-    */
     double xa = ((d*a.x)/(-a.z))+dx;
     double ya = ((d*a.y)/(-a.z))+dy;
     double xb = ((d*b.x)/(-b.z))+dx;
@@ -429,7 +415,6 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
             xlAB = xi;
             xrAB = xi;
         }
-
         xq = xc;
         yq = yc;
         if ((yi-yp)*(yi-yq) <= 0 && yp != yq) {
@@ -437,7 +422,6 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
             xlAC = xi;
             xrAC = xi;
         }
-
         xp = xb;
         yp = yb;
         xq = xc;
@@ -447,7 +431,6 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
             xlBC = xi;
             xrBC = xi;
         }
-
         double left = std::min(xlAB, xlAC);
         double right = std::max(xrAB, xrAC);
         int xl = (int) lround(std::min(left, xlBC)+0.5);
@@ -465,128 +448,11 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
         double k = w1*a.x + w2*a.y + w3*a.z;
         double dzdx = w1/(-d*k);
         double dzdy = w2/(-d*k);
-
-        Color color(ambientRed, ambientGreen, ambientBlue);
-        /*
-        for (auto curLight : lights) {
-            if (curLight->getType() == 'L') continue;
-
-            if (curLight->getType() == 'I') {
-                Vector3D n = Vector3D::vector(w1, w2, w3);
-                if (k > 0) n = -n;
-                n.normalise();
-
-                auto infLight = (InfLight*) curLight;
-                Vector3D l = infLight->ldVector;
-
-                l.normalise();
-                l = -l;
-
-                double dot = l.dot(n);
-                if (dot >= 0) {
-                    color.red += curLight->diffuseLight.red * diffuseReflection.red * dot;
-                    color.green += curLight->diffuseLight.green * diffuseReflection.green * dot;
-                    color.blue += curLight->diffuseLight.blue * diffuseReflection.blue * dot;
-
-                    if (color.red > 1) color.red = 1;
-                    if (color.green > 1) color.green = 1;
-                    if (color.blue > 1) color.blue = 1;
-                }
-            }
-        }
-        */
         for (int i = xl; i <= xr; i++) {
             double cur_z_value = buffer[i][yi];
             double new_z_value = 1.0001*one_over_zg + (i-xg)*(dzdx) + (yi-yg)*(dzdy);
-
             if (new_z_value < cur_z_value) {
                 buffer[i][yi] = new_z_value;
-                /*
-                Color secondColor(color);
-                for (auto curLight : lights) {
-                    if (curLight->getType() == 'L') continue;
-                    if (curLight->getType() == 'P') {
-                        auto pointLight = (PointLight *) curLight;
-                        Vector3D location = pointLight->location;
-                        double spotAngle = pointLight->spotAngle * M_PI / 180.0;
-
-                        Vector3D n = Vector3D::vector(w1, w2, w3);
-                        if (k > 0) n = -n;
-                        n.normalise();
-
-                        double z = 1.0 / new_z_value;
-                        double x = -z * (i - dx) / d;
-                        double y = -z * (yi - dy) / d;
-                        Vector3D l = location - Vector3D::point(x, y, z);
-                        l.normalise();
-
-                        double dot = l.dot(n);
-                        if (dot > cos(spotAngle)) {
-                            double angleValue = 1 - ((1 - dot) / (1 - cos(spotAngle)));
-                            secondColor.red += curLight->diffuseLight.red * diffuseReflection.red * angleValue;
-                            secondColor.green += curLight->diffuseLight.green * diffuseReflection.green * angleValue;
-                            secondColor.blue += curLight->diffuseLight.blue * diffuseReflection.blue * angleValue;
-
-                            if (secondColor.red > 1) secondColor.red = 1;
-                            if (secondColor.green > 1) secondColor.green = 1;
-                            if (secondColor.blue > 1) secondColor.blue = 1;
-                        }
-
-                        if (curLight->specularLight.red != 0 || curLight->specularLight.green != 0 || curLight->specularLight.blue != 0) {
-                            Vector3D p = Vector3D::vector(-x, -y, -z);
-                            p.normalise();
-
-                            Vector3D r = 2 * n * dot - l;
-                            r.normalise();
-
-                            double beta = p.dot(r);
-                            if (beta > 0) {
-                                secondColor.red += curLight->diffuseLight.red * specularReflection.red * std::pow(beta, reflectionCoeff);
-                                secondColor.green += curLight->diffuseLight.green * specularReflection.green * std::pow(beta, reflectionCoeff);
-                                secondColor.blue += curLight->diffuseLight.blue * specularReflection.blue * std::pow(beta, reflectionCoeff);
-
-                                if (secondColor.red > 1) secondColor.red = 1;
-                                if (secondColor.green > 1) secondColor.green = 1;
-                                if (secondColor.blue > 1) secondColor.blue = 1;
-                            }
-                        }
-                    }
-                    else if (curLight->specularLight.red != 0 || curLight->specularLight.green != 0 || curLight->specularLight.blue != 0) {
-                        auto infLight = (InfLight*) curLight;
-                        Vector3D l = infLight->ldVector;
-                        l.normalise();
-                        l = -l;
-
-                        double z = 1.0 / new_z_value;
-                        double x = -z * (i - dx) / d;
-                        double y = -z * (yi - dy) / d;
-
-                        Vector3D p = Vector3D::vector(-x, -y, -z);
-                        p.normalise();
-
-                        Vector3D n = Vector3D::vector(w1, w2, w3);
-                        if (k > 0) n = -n;
-                        n.normalise();
-
-                        double dot = l.dot(n);
-
-                        Vector3D r = 2 * n * dot - l;
-                        r.normalise();
-
-                        double beta = p.dot(r);
-                        if (beta > 0) {
-                            secondColor.red += curLight->diffuseLight.red * specularReflection.red * std::pow(beta, reflectionCoeff);
-                            secondColor.green += curLight->diffuseLight.green * specularReflection.green * std::pow(beta, reflectionCoeff);
-                            secondColor.blue += curLight->diffuseLight.blue * specularReflection.blue * std::pow(beta, reflectionCoeff);
-
-                            if (secondColor.red > 1) secondColor.red = 1;
-                            if (secondColor.green > 1) secondColor.green = 1;
-                            if (secondColor.blue > 1) secondColor.blue = 1;
-                        }
-                    }
-                }
-                */
-                //img::Color finalColor(secondColor.red * 255, secondColor.green * 255, secondColor.blue * 255);
                 img::Color finalColor(lights.red, lights.green, lights.blue);
                 (*this)(i, yi) = finalColor;
             }
