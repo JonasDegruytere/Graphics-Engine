@@ -18,35 +18,31 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
     std::map<char, bool> draw;
 
     std::string stochastic;
-    if (!configuration["2DLSystem"]["stochastic"].as_string_if_exists(stochastic)) {
+    LParser::LSystem2D l_system;
+    std::ifstream input_stream(inputfile);
+    input_stream >> l_system;
+    input_stream.close();
 
-        LParser::LSystem2D l_system;
-        std::ifstream input_stream(inputfile);
-        input_stream >> l_system;
-        input_stream.close();
-
-        const std::set<char> alphabet = l_system.get_alphabet();
-        initiator = l_system.get_initiator();
-        angle = l_system.get_angle();
-        starting_angle = l_system.get_starting_angle();
-        const unsigned int iterations = l_system.get_nr_iterations();
-        std::map<char, std::string> replacements;
-        for (auto i: alphabet) {
-            draw[i] = l_system.draw(i);
-            replacements[i] = l_system.get_replacement(i);
+    const std::set<char> alphabet = l_system.get_alphabet();
+    initiator = l_system.get_initiator();
+    angle = l_system.get_angle();
+    starting_angle = l_system.get_starting_angle();
+    const unsigned int iterations = l_system.get_nr_iterations();
+    std::map<char, std::string> replacements;
+    for (auto i: alphabet) {
+        draw[i] = l_system.draw(i);
+        replacements[i] = l_system.get_replacement(i);
+    }
+    for (unsigned int i = 0; i < iterations; i++) {
+        std::string replacement;
+        for (auto j: initiator) {
+            if (j == '+') replacement += "+";
+            else if (j == '-') replacement += "-";
+            else if (j == '(') replacement += "(";
+            else if (j == ')') replacement += ")";
+            else replacement += replacements[j];
         }
-
-        for (unsigned int i = 0; i < iterations; i++) {
-            std::string replacement;
-            for (auto j: initiator) {
-                if (j == '+') replacement += "+";
-                else if (j == '-') replacement += "-";
-                else if (j == '(') replacement += "(";
-                else if (j == ')') replacement += ")";
-                else replacement += replacements[j];
-            }
-            initiator = replacement;
-        }
+        initiator = replacement;
     }
 
     Point2D cur_point;
@@ -89,12 +85,12 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
 
 img::EasyImage System2DL::coordToPixel(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer) {
     std::list<Point2D> points;
+    std::list<double> xPoints;
+    std::list<double> yPoints;
     for (auto &i: lines) {
         points.push_back(i.p1);
         points.push_back(i.p2);
     }
-    std::list<double> xPoints;
-    std::list<double> yPoints;
     for (auto &i: points) {
         xPoints.push_back(i.x);
         yPoints.push_back(i.y);

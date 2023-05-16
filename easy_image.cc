@@ -392,19 +392,19 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
     double xc = ((d*c.x)/(-c.z))+dx;
     double yc = ((d*c.y)/(-c.z))+dy;
 
-    double yMinTemp = std::min(ya, yb);
-    double yMaxTemp = std::max(ya, yb);
+    double yMinTemp = min(ya, yb);
+    double yMaxTemp = max(ya, yb);
 
-    int yMin = (int) lround(std::min(yMinTemp, yc) + 0.5);
-    int yMax = (int) lround(std::max(yMaxTemp, yc) - 0.5);
+    int yMin = (int) lround(min(yMinTemp, yc) + 0.5);
+    int yMax = (int) lround(max(yMaxTemp, yc) - 0.5);
 
     for (int yi = yMin; yi <= yMax; yi++) {
-        double xlAB = std::numeric_limits<double>::infinity();
-        double xlAC = std::numeric_limits<double>::infinity();
-        double xlBC = std::numeric_limits<double>::infinity();
-        double xrAB = -std::numeric_limits<double>::infinity();
-        double xrAC = -std::numeric_limits<double>::infinity();
-        double xrBC = -std::numeric_limits<double>::infinity();
+        double xlAB = numeric_limits<double>::infinity();
+        double xlAC = numeric_limits<double>::infinity();
+        double xlBC = numeric_limits<double>::infinity();
+        double xrAB = -numeric_limits<double>::infinity();
+        double xrAC = -numeric_limits<double>::infinity();
+        double xrBC = -numeric_limits<double>::infinity();
 
         double xp = xa;
         double yp = ya;
@@ -431,10 +431,10 @@ void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const V
             xlBC = xi;
             xrBC = xi;
         }
-        double left = std::min(xlAB, xlAC);
-        double right = std::max(xrAB, xrAC);
-        int xl = (int) lround(std::min(left, xlBC)+0.5);
-        int xr = (int) lround(std::max(right, xrBC)-0.5);
+        double left = min(xlAB, xlAC);
+        double right = max(xrAB, xrAC);
+        int xl = (int) lround(min(left, xlBC)+0.5);
+        int xr = (int) lround(max(right, xrBC)-0.5);
 
         double xg = (xa+xb+xc)/3;
         double yg = (ya+yb+yc)/3;
