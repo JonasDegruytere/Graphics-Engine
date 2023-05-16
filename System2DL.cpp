@@ -80,10 +80,10 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
             cur_point = new_point;
         }
     }
-    return coordToPixel(lines, size, BackgroundColorElement);
+    return DrawLines(lines, size, BackgroundColorElement);
 }
 
-img::EasyImage System2DL::coordToPixel(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer) {
+img::EasyImage System2DL::DrawLines(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer) {
     std::list<Point2D> points;
     std::list<double> xPoints;
     std::list<double> yPoints;
@@ -100,24 +100,19 @@ img::EasyImage System2DL::coordToPixel(Lines2D &lines, double size, img::Color b
     double xMin = *std::min_element(xPoints.begin(), xPoints.end());
     double yMax = *std::max_element(yPoints.begin(), yPoints.end());
     double yMin = *std::min_element(yPoints.begin(), yPoints.end());
-
     double xRange = xMax - xMin;
     double yRange = yMax - yMin;
-
     double imageX = size * (xRange / std::max(xRange, yRange));
     double imageY = size * (yRange / std::max(xRange, yRange));
 
     double d = 0.95 * (imageX / xRange);
-
     double DCx = d * ((xMax + xMin)/2.0);
     double DCy = d * ((yMax + yMin)/2.0);
     double dx = (imageX/2.0) - DCx;
     double dy = (imageY/2.0) - DCy;
 
     img::EasyImage image(lround(imageX), lround(imageY), backgroundColor);
-
     ZBuffer buffer(image.get_width(), image.get_height());
-
     for (auto &i : lines) {
         i.p1.x = i.p1.x * d + dx;
         i.p1.y = i.p1.y * d + dy;
@@ -125,8 +120,9 @@ img::EasyImage System2DL::coordToPixel(Lines2D &lines, double size, img::Color b
         i.p2.y = i.p2.y * d + dy;
         img::Color col(i.color.red*255,i.color.green*255,i.color.blue*255);
         if (zBuffer) {
-            image.draw_zbuf_line(buffer, lround(i.p1.x), lround(i.p1.y), i.z1, lround(i.p2.x), lround(i.p2.y), i.z2, col);
-        } else {
+            image.drawZbufLine(buffer, lround(i.p1.x), lround(i.p1.y), i.z1, lround(i.p2.x), lround(i.p2.y), i.z2, col);
+        }
+        else {
             image.draw_line(lround(i.p1.x), lround(i.p1.y), lround(i.p2.x), lround(i.p2.y), col);
         }
     }

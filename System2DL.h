@@ -16,7 +16,7 @@ using namespace std;
 
 namespace System2DL {
     img::EasyImage LSystem2D(const ini::Configuration &configuration);
-    img::EasyImage coordToPixel(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer = false);
+    img::EasyImage DrawLines(Lines2D &lines, double size, img::Color backgroundColor, bool zBuffer = false);
 };
 
 

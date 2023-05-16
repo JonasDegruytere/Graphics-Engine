@@ -262,8 +262,8 @@ void img::EasyImage::draw_line(unsigned int x0, unsigned int y0, unsigned int x1
 		}
 	}
 }
-void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned int y0, double z0,
-                                    unsigned int x1, unsigned int y1, double z1, Color &color)
+void img::EasyImage::drawZbufLine(ZBuffer &buffer, unsigned int x0, unsigned int y0, double z0,
+                                  unsigned int x1, unsigned int y1, double z1, Color &color)
 {
     assert(x0 < this->width && y0 < this->height);
     assert(x1 < this->width && y1 < this->height);
@@ -279,8 +279,7 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
             buffer[x0][y0] = new_z_value;
         }
     }
-    else if (x0 == x1)
-    {
+    else if (x0 == x1){
         if (y0 > y1) {
             std::swap(x0, x1);
             std::swap(y0, y1);
@@ -289,20 +288,17 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
         //special case for x0 == x1
         double a = std::max(y0, y1) - std::min(y0, y1);
         unsigned int k = 0;
-        for (unsigned int i = std::min(y0, y1); i <= std::max(y0, y1); i++)
-        {
+        for (unsigned int i = std::min(y0, y1); i <= std::max(y0, y1); i++){
             double cur_z_value = buffer[x0][i];
             double new_z_value = (((a-k)/a)/z0) + ((1-((a-k)/a))/z1);
             k++;
-
             if (new_z_value < cur_z_value) {
                 (*this)(x0, i) = finalColor;
                 buffer[x0][i] = new_z_value;
             }
         }
     }
-    else if (y0 == y1)
-    {
+    else if (y0 == y1){
         if (x0 > x1) {
             std::swap(x0, x1);
             std::swap(y0, y1);
@@ -311,8 +307,7 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
         //special case for y0 == y1
         double a = std::max(x0, x1) - std::min(x0, x1);
         unsigned int k = 0;
-        for (unsigned int i = std::min(x0, x1); i <= std::max(x0, x1); i++)
-        {
+        for (unsigned int i = std::min(x0, x1); i <= std::max(x0, x1); i++){
             double cur_z_value = buffer[i][y0];
             double new_z_value = (((a-k)/a)/z0) + ((1-((a-k)/a))/z1);
             k++;
@@ -323,58 +318,47 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
             }
         }
     }
-    else
-    {
-        if (x0 > x1)
-        {
+    else{
+        if (x0 > x1){
             //flip points if x1>x0: we want x0 to have the lowest value
             std::swap(x0, x1);
             std::swap(y0, y1);
             std::swap(z0, z1);
         }
         double m = ((double) y1 - (double) y0) / ((double) x1 - (double) x0);
-        if (-1.0 <= m && m <= 1.0)
-        {
+        if (-1.0 <= m && m <= 1.0){
             double a = x1-x0;
             unsigned int k = 0;
-            for (unsigned int i = 0; i <= (x1 - x0); i++)
-            {
+            for (unsigned int i = 0; i <= (x1 - x0); i++){
                 double cur_z_value = buffer[x0+i][(unsigned int) round(y0 + m * i)];
                 double new_z_value = (((a-k)/a)/z0) + ((1-((a-k)/a))/z1);
                 k++;
-
                 if (new_z_value < cur_z_value) {
                     (*this)(x0 + i, (unsigned int) round(y0 + m * i)) = finalColor;
                     buffer[x0+i][(unsigned int) round(y0 + m * i)] = new_z_value;
                 }
             }
         }
-        else if (m > 1.0)
-        {
+        else if (m > 1.0){
             double a = y1-y0;
             unsigned int k = 0;
-            for (unsigned int i = 0; i <= (y1 - y0); i++)
-            {
+            for (unsigned int i = 0; i <= (y1 - y0); i++){
                 double cur_z_value = buffer[(unsigned int) round(x0 + (i / m))][y0 + i];
                 double new_z_value = (((a-k)/a)/z0) + ((1-((a-k)/a))/z1);
                 k++;
-
                 if (new_z_value < cur_z_value) {
                     (*this)((unsigned int) round(x0 + (i / m)), y0 + i) = finalColor;
                     buffer[(unsigned int) round(x0 + (i / m))][y0 + i] = new_z_value;
                 }
             }
         }
-        else if (m < -1.0)
-        {
+        else if (m < -1.0){
             double a = y0-y1;
             unsigned int k = 0;
-            for (unsigned int i = 0; i <= (y0 - y1); i++)
-            {
+            for (unsigned int i = 0; i <= (y0 - y1); i++){
                 double cur_z_value = buffer[(unsigned int) round(x0 - (i / m))][y0 - i];
                 double new_z_value = (((a-k)/a)/z0) + ((1-((a-k)/a))/z1);
                 k++;
-
                 if (new_z_value < cur_z_value) {
                     (*this)((unsigned int) round(x0 - (i / m)), y0 - i) = finalColor;
                     buffer[(unsigned int) round(x0 - (i / m))][y0 - i] = new_z_value;
@@ -383,7 +367,7 @@ void img::EasyImage::draw_zbuf_line(ZBuffer &buffer, unsigned int x0, unsigned i
         }
     }
 }
-void img::EasyImage::draw_zbuf_triag(ZBuffer &buffer, const Vector3D &a, const Vector3D &b, const Vector3D &c, double d, double dx, double dy, Color &lights)
+void img::EasyImage::drawZbufTriangle(ZBuffer &buffer, const Vector3D &a, const Vector3D &b, const Vector3D &c, double d, double dx, double dy, Color &lights)
 {
     double xa = ((d*a.x)/(-a.z))+dx;
     double ya = ((d*a.y)/(-a.z))+dy;

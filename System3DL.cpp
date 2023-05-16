@@ -5,9 +5,9 @@
 #include "System3DL.h"
 
 void Transfor::toPolar(const Vector3D &point, double &theta, double &phi, double &r) {
-    r = std::sqrt(std::pow(point.x, 2) + std::pow(point.y, 2) + std::pow(point.z, 2));
-    theta = std::atan2(point.y, point.x);
-    phi = std::acos(point.z/r);
+    r = sqrt(pow(point.x, 2) + pow(point.y, 2) + pow(point.z, 2));
+    theta = atan2(point.y, point.x);
+    phi = acos(point.z/r);
 }
 
 void Transformation::splitTriangles(Figure &figure) {
@@ -46,45 +46,43 @@ void Transformation::splitTriangles(Figure &figure) {
 }
 
 void Transformation::triangulate(Figure &fig) {
-    std::vector<Face> newFaces;
-
+    vector<Face> newFaces;
     for (auto &f: fig.faces) {
         if (f.pointIndexes.size() > 3) {
             for (unsigned int i = 1; i < f.pointIndexes.size()-1; i++) {
                 Face newFace({f.pointIndexes[0], f.pointIndexes[i], f.pointIndexes[i+1]});
                 newFaces.push_back(newFace);
             }
-        } else newFaces.push_back(f);
+        }
+        else {newFaces.push_back(f);}
     }
     fig.faces = newFaces;
 }
 
 void Transformation::calculateValues(Lines2D &lines, double size, double &width, double &height, double &d, double &dx, double &dy) {
-    std::list<Point2D> points;
+    list<Point2D> points;
+    list<double> xPoints;
+    list<double> yPoints;
     for (auto &i: lines) {
         points.push_back(i.p1);
         points.push_back(i.p2);
     }
-    std::list<double> xPoints;
-    std::list<double> yPoints;
     for (auto &i: points) {
         xPoints.push_back(i.x);
         yPoints.push_back(i.y);
     }
-
-    double xMax = *std::max_element(xPoints.begin(), xPoints.end());
-    double xMin = *std::min_element(xPoints.begin(), xPoints.end());
-    double yMax = *std::max_element(yPoints.begin(), yPoints.end());
-    double yMin = *std::min_element(yPoints.begin(), yPoints.end());
+    double xMax = *max_element(xPoints.begin(), xPoints.end());
+    double xMin = *min_element(xPoints.begin(), xPoints.end());
+    double yMax = *max_element(yPoints.begin(), yPoints.end());
+    double yMin = *min_element(yPoints.begin(), yPoints.end());
 
     double xRange = xMax - xMin;
     double yRange = yMax - yMin;
 
-    width = size * (xRange / std::max(xRange, yRange));
-    height = size * (yRange / std::max(xRange, yRange));
+    width = size * (xRange / max(xRange, yRange));
+    height = size * (yRange / max(xRange, yRange));
 
     d = 0.95 * (width / xRange);
-
     double DCx = d * ((xMax + xMin)/2.0);
     double DCy = d * ((yMax + yMin)/2.0);
     dx = (width/2.0) - DCx;
@@ -96,7 +94,6 @@ Matrix Transformation::scaleFigure(double scale) {
     S(1, 1) = scale;
     S(2, 2) = scale;
     S(3, 3) = scale;
-
     return S;
 }
 
@@ -106,7 +103,6 @@ Matrix Transformation::rotateX(double angle) {
     Mx(2, 3) = sin(angle);
     Mx(3, 2) = -sin(angle);
     Mx(3, 3) = cos(angle);
-
     return Mx;
 }
 
@@ -116,7 +112,6 @@ Matrix Transformation::rotateY(double angle) {
     My(1, 3) = -sin(angle);
     My(3, 1) = sin(angle);
     My(3, 3) = cos(angle);
-
     return My;
 }
 
@@ -126,7 +121,6 @@ Matrix Transformation::rotateZ(double angle) {
     Mz(1, 2) = sin(angle);
     Mz(2, 1) = -sin(angle);
     Mz(2, 2) = cos(angle);
-
     return Mz;
 }
 
@@ -135,25 +129,22 @@ Matrix Transformation::translate(const Vector3D &vec) {
     T(4, 1) = vec.x;
     T(4, 2) = vec.y;
     T(4, 3) = vec.z;
-
     return T;
 }
 
 Matrix Transformation::eyePointTrans(const Vector3D &eyepoint) {
     double theta, phi, r;
     Transfor::toPolar(eyepoint, theta, phi, r);
-
     Matrix M;
-    M(1, 1) = -std::sin(theta);
-    M(1, 2) = -std::cos(theta) * std::cos(phi);
-    M(1, 3) = std::cos(theta) * std::sin(phi);
-    M(2, 1) = std::cos(theta);
-    M(2, 2) = -std::sin(theta) * std::cos(phi);
-    M(2, 3) = std::sin(theta) * std::sin(phi);
-    M(3, 2) = std::sin(phi);
-    M(3, 3) = std::cos(phi);
+    M(1, 1) = -sin(theta);
+    M(1, 2) = -cos(theta) * cos(phi);
+    M(1, 3) = cos(theta) * sin(phi);
+    M(2, 1) = cos(theta);
+    M(2, 2) = -sin(theta) * cos(phi);
+    M(2, 3) = sin(theta) * sin(phi);
+    M(3, 2) = sin(phi);
+    M(3, 3) = cos(phi);
     M(4, 3) = -r;
-
     return M;
 }
 
@@ -163,31 +154,31 @@ void Transformation::applyTransformation(Figure &fig, const Matrix &M) {
     }
 }
 
-Figure System3DL::LSystem3D(const ini::Configuration &configuration, const std::string &figureName, Matrix &V, bool transform, bool light) {
+Figure System3DL::LSystem3D(const ini::Configuration &configuration, const string &figureName, Matrix &V, bool transform, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();;
-    const std::string inputfile = configuration[figureName]["inputfile"].as_string_or_die();
-    std::vector<double> color;
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();;
+    const string inputfile = configuration[figureName]["inputfile"].as_string_or_die();
+    vector<double> color;
 
     if (light) {
         color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
     }
     else color = configuration[figureName]["color"].as_double_tuple_or_die();
     LParser::LSystem3D l_system;
-    std::ifstream input_stream(inputfile);
+    ifstream input_stream(inputfile);
     input_stream >> l_system;
     input_stream.close();
 
-    const std::set<char> alphabet = l_system.get_alphabet();
-    std::string initiator = l_system.get_initiator();
+    const set<char> alphabet = l_system.get_alphabet();
+    string initiator = l_system.get_initiator();
     double angle = l_system.get_angle();
     const unsigned int iterations = l_system.get_nr_iterations();
 
-    std::map<char, std::string> replacements;
-    std::map<char, bool> draw;
+    map<char, string> replacements;
+    map<char, bool> draw;
     for (auto i: alphabet) {
         draw[i] = l_system.draw(i);
         replacements[i] = l_system.get_replacement(i);
@@ -199,10 +190,10 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const std::
     Vector3D H = Vector3D::vector(1, 0, 0);
     Vector3D L = Vector3D::vector(0, 1, 0);
     Vector3D U = Vector3D::vector(0, 0, 1);
-    std::stack<Vector3D> pointStack;
-    std::stack<Vector3D> HStack;
-    std::stack<Vector3D> LStack;
-    std::stack<Vector3D> UStack;
+    stack<Vector3D> pointStack;
+    stack<Vector3D> HStack;
+    stack<Vector3D> LStack;
+    stack<Vector3D> UStack;
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -210,7 +201,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const std::
     int indexCounter = 0;
 
     for (unsigned int i = 0; i < iterations; i++) {
-        std::string replacement;
+        string replacement;
         for (auto j: initiator) {
             if (j == '+') replacement += "+";
             else if (j == '-') replacement += "-";
@@ -226,7 +217,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const std::
         initiator = replacement;
     }
 
-    std::vector<Vector3D> toAdd;
+    vector<Vector3D> toAdd;
     for (unsigned int k = 0; k < initiator.length(); k++) {
         char i = initiator[k];
         if (i == '+') {

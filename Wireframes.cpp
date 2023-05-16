@@ -17,13 +17,12 @@ Lines2D doProjection(const Figures3D &figs) {
                 if (k == curFace.pointIndexes.size() - 1) {
                     line.p1 = doProjection(curFigure.points[curFace.pointIndexes[k]], 1);
                     line.p2 = doProjection(curFigure.points[curFace.pointIndexes[0]], 1);
-
                     line.z1 = curFigure.points[curFace.pointIndexes[k]].z;
                     line.z2 = curFigure.points[curFace.pointIndexes[0]].z;
-                } else {
+                } 
+                else {
                     line.p1 = doProjection(curFigure.points[curFace.pointIndexes[k]], 1);
                     line.p2 = doProjection(curFigure.points[curFace.pointIndexes[k + 1]], 1);
-
                     line.z1 = curFigure.points[curFace.pointIndexes[k]].z;
                     line.z2 = curFigure.points[curFace.pointIndexes[k + 1]].z;
                 }
@@ -44,13 +43,12 @@ Lines2D doProjectionConst(const Figures3D &figs) {
                 if (k == j.pointIndexes.size()-1) {
                     line.p1 = doProjection(i.points[j.pointIndexes[k]], 1);
                     line.p2 = doProjection(i.points[j.pointIndexes[0]], 1);
-
                     line.z1 = i.points[j.pointIndexes[k]].z;
                     line.z2 = i.points[j.pointIndexes[0]].z;
-                } else {
+                } 
+                else {
                     line.p1 = doProjection(i.points[j.pointIndexes[k]], 1);
                     line.p2 = doProjection(i.points[j.pointIndexes[k+1]], 1);
-
                     line.z1 = i.points[j.pointIndexes[k]].z;
                     line.z2 = i.points[j.pointIndexes[k+1]].z;
                 }
@@ -62,13 +60,13 @@ Lines2D doProjectionConst(const Figures3D &figs) {
     return lines;
 }
 
-Figure createEyeFigure(const ini::Configuration &configuration, std::string &figureName, Matrix &V) {
+Figure createEyeFigure(const ini::Configuration &configuration, string &figureName, Matrix &V) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color = configuration[figureName]["color"].as_double_tuple_or_die();
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color = configuration[figureName]["color"].as_double_tuple_or_die();
     const unsigned int nrPoints = configuration[figureName]["nrPoints"].as_int_or_die();
     const unsigned int nrLines = configuration[figureName]["nrLines"].as_int_or_die();
 
@@ -77,53 +75,40 @@ Figure createEyeFigure(const ini::Configuration &configuration, std::string &fig
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
-
+    
     for (unsigned int j = 0; j < nrPoints; j++) {
-        std::string pointName = "point" + std::to_string(j);
-
-        std::vector<double> point_vec = configuration[figureName][pointName].as_double_tuple_or_die();
+        string pointName = "point" + to_string(j);
+        vector<double> point_vec = configuration[figureName][pointName].as_double_tuple_or_die();
         fig.points.push_back(Vector3D::point(point_vec[0], point_vec[1], point_vec[2]));
     }
-
     for (unsigned int j = 0; j < nrLines; j++) {
-        std::string lineName = "line" + std::to_string(j);
-
-        std::vector<int> line_vec = configuration[figureName][lineName].as_int_tuple_or_die();
+        string lineName = "line" + to_string(j);
+        vector<int> line_vec = configuration[figureName][lineName].as_int_tuple_or_die();
         Face f(line_vec);
         fig.faces.push_back(f);
     }
-
     Transformation::applyTransformation(fig, F);
-
     return fig;
 }
 
-Figure createCube(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createCube(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getCubeFigure();
@@ -133,27 +118,20 @@ Figure createCube(const ini::Configuration &configuration, std::string &figureNa
     return fig;
 }
 
-Figure createTetrahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createTetrahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getTetrahedronFigure();
@@ -163,27 +141,20 @@ Figure createTetrahedron(const ini::Configuration &configuration, std::string &f
     return fig;
 }
 
-Figure createOctahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createOctahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getOctahedronFigure();
@@ -193,27 +164,20 @@ Figure createOctahedron(const ini::Configuration &configuration, std::string &fi
     return fig;
 }
 
-Figure createIcosahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createIcosahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getIcosahedronFigure();
@@ -223,27 +187,20 @@ Figure createIcosahedron(const ini::Configuration &configuration, std::string &f
     return fig;
 }
 
-Figure createDodecahedron(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createDodecahedron(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getDodecahedronFigure();
@@ -253,20 +210,14 @@ Figure createDodecahedron(const ini::Configuration &configuration, std::string &
     return fig;
 }
 
-Figure createSphere(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createSphere(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
     const unsigned int n = configuration[figureName]["n"].as_int_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
@@ -274,7 +225,6 @@ Figure createSphere(const ini::Configuration &configuration, std::string &figure
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig = Figures::getIcosahedronFigure();
@@ -282,28 +232,20 @@ Figure createSphere(const ini::Configuration &configuration, std::string &figure
     for (unsigned int i = 0; i < n; i++) {
         Transformation::splitTriangles(fig);
     }
-
     for (auto & point : fig.points) point.normalise();
-
     Transformation::applyTransformation(fig, F);
 
     return fig;
 }
 
-Figure createCone(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createCone(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
     const int n = configuration[figureName]["n"].as_int_or_die();
     const double height = configuration[figureName]["height"].as_double_or_die();
 
@@ -312,7 +254,6 @@ Figure createCone(const ini::Configuration &configuration, std::string &figureNa
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig;
@@ -321,7 +262,6 @@ Figure createCone(const ini::Configuration &configuration, std::string &figureNa
         fig.points.push_back(Vector3D::point(cos((2*M_PI*i)/n), sin((2*M_PI*i)/n), 0));
     }
     fig.points.push_back(Vector3D::point(0, 0, height));
-
     Face ground;
     for (int i = 0; i < n; i++) {
         Face face({i, (i+1)%n, n});
@@ -330,26 +270,19 @@ Figure createCone(const ini::Configuration &configuration, std::string &figureNa
         ground.pointIndexes.push_back(n-i-1);
     }
     fig.faces.push_back(ground);
-
     Transformation::applyTransformation(fig, F);
 
     return fig;
 }
 
-Figure createCylinder(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createCylinder(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
     const int n = configuration[figureName]["n"].as_int_or_die();
     const double height = configuration[figureName]["height"].as_double_or_die();
 
@@ -358,7 +291,6 @@ Figure createCylinder(const ini::Configuration &configuration, std::string &figu
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig;
@@ -369,7 +301,6 @@ Figure createCylinder(const ini::Configuration &configuration, std::string &figu
     for (int i = 0; i < n; i++) {
         fig.points.push_back(Vector3D::point(cos((2*M_PI*i)/n), sin((2*M_PI*i)/n), height));
     }
-
     for (int i = 0; i < n-1; i++) {
         Face face({i, (i+1)%n, (i+n+1)%(2*n), n+i});
         fig.faces.push_back(face);
@@ -383,26 +314,19 @@ Figure createCylinder(const ini::Configuration &configuration, std::string &figu
     for (int i = n; i <= (2*n)-1; i++) roof.pointIndexes.push_back(i);
     fig.faces.push_back(ground);
     fig.faces.push_back(roof);
-
     Transformation::applyTransformation(fig, F);
 
     return fig;
 }
 
-Figure createTorus(const ini::Configuration &configuration, std::string &figureName, Matrix &V, bool light) {
+Figure createTorus(const ini::Configuration &configuration, string &figureName, Matrix &V, bool light) {
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
-    std::vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    std::vector<double> color;
-    if (light) {
-        color = configuration[figureName]["ambientReflection"].as_double_tuple_or_die();
-    }
-    else color = configuration[figureName]["color"].as_double_tuple_or_die();
-    std::vector<double> diffuseReflection = configuration[figureName]["diffuseReflection"].as_double_tuple_or_default({0, 0, 0});
-    std::vector<double> specularReflection = configuration[figureName]["specularReflection"].as_double_tuple_or_default({0, 0, 0});
-    const double reflectionCoefficient = configuration[figureName]["reflectionCoefficient"].as_double_or_default(0);
+    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
     const int n = configuration[figureName]["n"].as_int_or_die();
     const int m = configuration[figureName]["m"].as_int_or_die();
     const double R = configuration[figureName]["R"].as_double_or_die();
@@ -413,14 +337,12 @@ Figure createTorus(const ini::Configuration &configuration, std::string &figureN
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
     Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-
     Matrix F = S * rX * rY * rZ * T * V;
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
-    std::vector<std::vector<int>> pointTracker(n, std::vector<int>(m, 0));
+    vector<vector<int>> pointTracker(n, vector<int>(m, 0));
     int loopCounter = 0;
-
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             fig.points.push_back(Vector3D::point(cos((2*M_PI*i)/n)*(R+ cos((2*M_PI*j)/n)),
@@ -430,14 +352,12 @@ Figure createTorus(const ini::Configuration &configuration, std::string &figureN
             loopCounter++;
         }
     }
-
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
             Face face({pointTracker[i][j], pointTracker[(i+1)%n][j], pointTracker[(i+1)%n][(j+1)%m], pointTracker[i][(j+1)%m]});
             fig.faces.push_back(face);
         }
     }
-
     Transformation::applyTransformation(fig, F);
 
     return fig;
@@ -445,21 +365,16 @@ Figure createTorus(const ini::Configuration &configuration, std::string &figureN
 
 img::EasyImage Lines3D::wireframe(const ini::Configuration &configuration, bool zBuffer) {
     Figures3D figures;
-
     const unsigned int size = configuration["General"]["size"].as_int_or_die();
-    std::vector<double> backgroundColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
+    vector<double> backgroundColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
     const unsigned int nrFigures = configuration["General"]["nrFigures"].as_int_or_die();
-    std::vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
-
+    vector<double> eye = configuration["General"]["eye"].as_double_tuple_or_die();
     Matrix V = Transformation::eyePointTrans(Vector3D::point(eye[0], eye[1], eye[2]));
-
     Figures3D currentFigs;
 
     for (unsigned int i = 0; i < nrFigures; i++) {
-        std::string figureName = "Figure" + std::to_string(i);
-
-        std::string type = configuration[figureName]["type"].as_string_or_die();
-
+        string figureName = "Figure" + to_string(i);
+        string type = configuration[figureName]["type"].as_string_or_die();
         if (type == "LineDrawing") currentFigs = {createEyeFigure(configuration, figureName, V)};
         else if (type == "Cube") currentFigs = {createCube(configuration, figureName, V)};
         else if (type == "Tetrahedron") currentFigs = {createTetrahedron(configuration, figureName, V)};
@@ -473,12 +388,13 @@ img::EasyImage Lines3D::wireframe(const ini::Configuration &configuration, bool 
         else if (type == "3DLSystem") currentFigs = {System3DL::LSystem3D(configuration, figureName, V)};
         for (auto &curFig : currentFigs) figures.push_back(curFig);
     }
-
     Lines2D lines = doProjection(figures);
-
     if (zBuffer) {
-        return System2DL::coordToPixel(lines, size, img::Color(backgroundColor[0] * 255, backgroundColor[1] * 255, backgroundColor[2] * 255), true);
-    } else {
-        return System2DL::coordToPixel(lines, size, img::Color(backgroundColor[0] * 255, backgroundColor[1] * 255, backgroundColor[2] * 255));
+        return System2DL::DrawLines(lines, size, img::Color(backgroundColor[0] * 255, backgroundColor[1] * 255,
+                                                            backgroundColor[2] * 255), true);
+    }
+    else {
+        return System2DL::DrawLines(lines, size, img::Color(backgroundColor[0] * 255, backgroundColor[1] * 255,
+                                                            backgroundColor[2] * 255));
     }
 }
