@@ -3,6 +3,35 @@
 //
 
 #include "System2DL.h"
+string System2DL::generateLSystemString(std::string &currentString, map<char, std::string> &replacementRules,
+                                        unsigned int depth) {
+    string nextString;
+    if (depth == 0){
+        return currentString;
+    }
+    for (const auto& step : currentString){
+        switch(step){
+            case '-': nextString.push_back('-'); break;
+            case '+': nextString.push_back('+'); break;
+            case '^': nextString.push_back('^'); break;
+            case '&': nextString.push_back('&'); break;
+            case '\\': nextString.push_back('\\'); break;
+            case '/': nextString.push_back('/'); break;
+            case '|': nextString.push_back('|'); break;
+            case '(': nextString.push_back('('); break;
+            case ')': nextString.push_back(')'); break;
+            default:
+                for (const auto& letter : replacementRules){
+                    if (step == letter.first){
+                        nextString += letter.second;
+                    }
+                }
+        }
+    }
+    depth--;
+    return generateLSystemString(nextString, replacementRules, depth);
+}
+
 
 img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
     vector<double> lineColor = configuration["2DLSystem"]["color"].as_double_tuple_or_die();
@@ -17,7 +46,6 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
     string initiator;
     double angle;
 
-    string stochastic;
     LParser::LSystem2D l_system;
     ifstream input_stream(inputfile);
     input_stream >> l_system;
@@ -33,17 +61,7 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
     }
     initiator = l_system.get_initiator();
     const unsigned int iterations = l_system.get_nr_iterations();
-    for (unsigned int i = 0; i < iterations; i++) {
-        string replacement;
-        for (auto j: initiator) {
-            if (j == '+') replacement += "+";
-            else if (j == '-') replacement += "-";
-            else if (j == '(') replacement += "(";
-            else if (j == ')') replacement += ")";
-            else replacement += replacements[j];
-        }
-        initiator = replacement;
-    }
+    initiator = System2DL::generateLSystemString(initiator,replacements,iterations);
 
     double curDirection = starting_angle;
     Point2D currentPoint;
@@ -52,21 +70,25 @@ img::EasyImage System2DL::LSystem2D(const ini::Configuration &configuration) {
     Lines2D lines;
     Line2D newLine;
     stack<Point2D> pointsStack;
-    stack<double> dirStack;
+    stack<double> TempStack;
     for (auto i: initiator) {
-        if (i == '+') curDirection += angle;
-        else if (i == '-') curDirection -= angle;
+        if (i == '+') {
+            curDirection += angle;
+        }
+        else if (i == '-') {
+            curDirection -= angle;
+        }
         else if (i == '(') {
             pointsStack.push(currentPoint);
-            dirStack.push(curDirection);
+            TempStack.push(curDirection);
         }
         else if (i == ')') {
             Point2D temp_point = pointsStack.top();
             pointsStack.pop();
             currentPoint.x = temp_point.x;
             currentPoint.y = temp_point.y;
-            curDirection = dirStack.top();
-            dirStack.pop();
+            curDirection = TempStack.top();
+            TempStack.pop();
         }
         else {
             Point2D newPoint;

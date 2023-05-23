@@ -3,7 +3,6 @@
 //
 
 #include "System3DL.h"
-
 void Transfor::toPolar(const Vector3D &point, double &theta, double &phi, double &r) {
     r = sqrt(pow(point.x, 2) + pow(point.y, 2) + pow(point.z, 2));
     theta = atan2(point.y, point.x);
@@ -154,6 +153,14 @@ void Transformation::applyTransformation(Figure &fig, const Matrix &M) {
     }
 }
 
+void toAddEmpty(Figure &fig, int &indexCounter, vector<Vector3D> &toAdd){
+    fig.points.push_back(toAdd[toAdd.size()-1]);
+    indexCounter++;
+    Face newFace({indexCounter, indexCounter-1});
+    fig.faces.push_back(newFace);
+    toAdd.clear();
+}
+
 Figure System3DL::LSystem3D(const ini::Configuration &configuration, const string &figureName, Matrix &V, bool transform) {
 
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
@@ -192,110 +199,73 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
     stack<Vector3D> HStack;
     stack<Vector3D> LStack;
     stack<Vector3D> UStack;
-    for (unsigned int i = 0; i < iterations; i++) {
-        string replacement;
-        for (auto j: initiator) {
-            if (j == '+') replacement += "+";
-            else if (j == '-') replacement += "-";
-            else if (j == '(') replacement += "(";
-            else if (j == ')') replacement += ")";
-            else if (j == '^') replacement += "^";
-            else if (j == '&') replacement += "&";
-            else if (j == '\\') replacement += "\\";
-            else if (j == '/') replacement += "/";
-            else if (j == '|') replacement += "|";
-            else replacement += replacements[j];
-        }
-        initiator = replacement;
-    }
+    initiator = System2DL::generateLSystemString(initiator,replacements,iterations);
     vector<Vector3D> toAdd;
     for (unsigned int k = 0; k < initiator.length(); k++) {
         char i = initiator[k];
         if (i == '+') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
+            auto temp = H * sin(angle);
             H = (H*cos(angle)) + (L*sin(angle));
             L = (L*cos(angle)) - (tempH*sin(angle));
             continue;
         }
         if (i == '-') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
+            auto temp = H * sin(angle);
             H = (H*cos(-angle)) + (L*sin(-angle));
             L = (L*cos(-angle)) - (tempH*sin(-angle));
             continue;
         }
         if (i == '^') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
+            auto temp = H * sin(angle);
             H = (H*cos(angle)) + (U*sin(angle));
             U = (U*cos(angle)) - (tempH*sin(angle));
             continue;
         }
         if (i == '&') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
+            auto temp = H * sin(angle);
             H = (H*cos(-angle)) + (U*sin(-angle));
             U = (U*cos(-angle)) - (tempH*sin(-angle));
             continue;
         }
         if (i == '\\') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempL(L);
+            auto temp = L * sin(angle);
             L = (L*cos(angle)) - (U*sin(angle));
             U = (tempL*sin(angle)) + (U*cos(angle));
             continue;
         }
         if (i == '/') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempL(L);
+            auto temp = L * sin(angle);
             L = (L*cos(-angle)) - (U*sin(-angle));
             U = (tempL*sin(-angle)) + (U*cos(-angle));
             continue;
         }
         if (i == '|') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             H = -H;
             L = -L;
@@ -303,11 +273,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
         }
         if (i == '(') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             pointStack.push(curPoint);
             HStack.push(H);
@@ -317,11 +283,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
         }
         if (i == ')') {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
             curPoint = pointStack.top();
             pointStack.pop();
@@ -340,11 +302,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
         if (draw[i]) toAdd.push_back(curPoint);
         else {
             if (!toAdd.empty()) {
-                fig.points.push_back(toAdd[toAdd.size()-1]);
-                indexCounter++;
-                Face newFace({indexCounter, indexCounter-1});
-                fig.faces.push_back(newFace);
-                toAdd.clear();
+                toAddEmpty(fig, indexCounter, toAdd);
             }
         }
     }
