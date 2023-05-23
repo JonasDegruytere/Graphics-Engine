@@ -64,14 +64,6 @@ Figure Figures::getOctahedronFigure() {
 Figure Figures::getIcosahedronFigure() {
     if (icosahedronFigure == nullptr) {
         icosahedronFigure = new Figure;
-        /*
-        icosahedronFigure->points = {Vector3D::point(0, 0, sqrt(5)/2), Vector3D::point(1, 0, 0.5), Vector3D::point(cos((2*M_PI)/5), sin((2*M_PI)/5), 0.5),
-                                     Vector3D::point(cos((4*M_PI)/5), sin((4*M_PI)/5), 0.5), Vector3D::point(cos((6*M_PI)/5), sin((6*M_PI)/5), 0.5),
-                                     Vector3D::point(cos((8*M_PI)/5), sin((8*M_PI)/5), 0.5), Vector3D::point(cos(M_PI/5), sin(M_PI/5), -0.5),
-                                     Vector3D::point(cos(3*M_PI/5), sin(3*M_PI/5), -0.5), Vector3D::point(cos(5*M_PI/5), sin(5*M_PI/5), -0.5),
-                                     Vector3D::point(cos(7*M_PI/5), sin(7*M_PI/5), -0.5), Vector3D::point(cos(9*M_PI/5), sin(9*M_PI/5), -0.5),
-                                     Vector3D::point(0, 0, -sqrt(5)/2)};
-        */
         icosahedronFigure->points.emplace_back(Vector3D::point(0, 0, std::sqrt(5)/2));
         //punt 2 tot 6
         for (int i = 2; i < 7; ++i){
@@ -115,28 +107,6 @@ Figure Figures::getDodecahedronFigure() {
     if (dodecahedronFigure == nullptr) {
         dodecahedronFigure = new Figure;
         Figure icosahedron = getIcosahedronFigure();
-        /*
-        dodecahedronFigure->points = {Vector3D::point((1+cos((2*M_PI)/5))/3, sin((2*M_PI)/5)/3, (1+(sqrt(5)/2))/3),
-                                      Vector3D::point((cos((2*M_PI)/5)+cos((4*M_PI)/5))/3, (sin((2*M_PI)/5)+sin((4*M_PI)/5))/3, (1+(sqrt(5)/2))/3),
-                                      Vector3D::point((cos((4*M_PI)/5)+cos((6*M_PI)/5))/3, (sin((4*M_PI)/5)+sin((6*M_PI)/5))/3, (1+(sqrt(5)/2))/3),
-                                      Vector3D::point((cos((6*M_PI)/5)+cos((8*M_PI)/5))/3, (sin((6*M_PI)/5)+sin((8*M_PI)/5))/3, (1+(sqrt(5)/2))/3),
-                                      Vector3D::point((1+cos((8*M_PI)/5))/3, (sin((8*M_PI)/5))/3, (1+(sqrt(5)/2))/3),
-                                      Vector3D::point((1+cos((2*M_PI)/5)+cos(M_PI/5))/3, (sin((2*M_PI)/5)+sin(M_PI/5))/3, (0.5)/3),
-                                      Vector3D::point((cos((2*M_PI)/5)+cos(M_PI/5)+cos((M_PI/5)+((2*M_PI)/5)))/3, (sin((2*M_PI)/5)+sin(M_PI/5)+sin((M_PI/5)+((2*M_PI)/5)))/3, (-0.5)/3),
-                                      Vector3D::point((cos((2*M_PI)/5)+cos((4*M_PI)/5)+cos((M_PI/5)+((2*M_PI)/5)))/3, (sin((2*M_PI)/5)+sin((4*M_PI)/5)+sin((M_PI/5)+((2*M_PI)/5)))/3, (0.5)/3),
-                                      Vector3D::point((cos((4*M_PI)/5)+cos((M_PI/5)+((2*M_PI)/5))+cos((M_PI/5)+((4*M_PI)/5)))/3, (sin((4*M_PI)/5)+sin((M_PI/5)+((2*M_PI)/5))+sin((M_PI/5)+((4*M_PI)/5)))/3, (-0.5)/3),
-                                      Vector3D::point((cos((4*M_PI)/5)+cos((6*M_PI)/5)+cos((M_PI/5)+((4*M_PI)/5)))/3, (sin((4*M_PI)/5)+sin((6*M_PI)/5)+sin((M_PI/5)+((4*M_PI)/5)))/3, (0.5)/3),
-                                      Vector3D::point((cos((6*M_PI)/5)+cos((M_PI/5)+((4*M_PI)/5))+cos((M_PI/5)+((6*M_PI)/5)))/3, (sin((6*M_PI)/5)+sin((M_PI/5)+((4*M_PI)/5))+sin((M_PI/5)+((6*M_PI)/5)))/3, (-0.5)/3),
-                                      Vector3D::point((cos((6*M_PI)/5)+cos((8*M_PI)/5)+cos((M_PI/5)+((6*M_PI)/5)))/3, (sin((6*M_PI)/5)+sin((8*M_PI)/5)+sin((M_PI/5)+((6*M_PI)/5)))/3, (0.5)/3),
-                                      Vector3D::point((cos((8*M_PI)/5)+cos((M_PI/5)+((6*M_PI)/5))+cos((M_PI/5)+((8*M_PI)/5)))/3, (sin((8*M_PI)/5)+sin((M_PI/5)+((6*M_PI)/5))+sin((M_PI/5)+((8*M_PI)/5)))/3, (-0.5)/3),
-                                      Vector3D::point((1+cos((8*M_PI)/5)+cos((M_PI/5)+((8*M_PI)/5)))/3, (sin((8*M_PI)/5)+sin((M_PI/5)+((8*M_PI)/5)))/3, (0.5)/3),
-                                      Vector3D::point((1+cos(M_PI/5)+cos((M_PI/5)+((8*M_PI)/5)))/3, (sin(M_PI/5)+sin((M_PI/5)+((8*M_PI)/5)))/3, (-0.5)/3),
-                                      Vector3D::point((cos(M_PI/5)+cos((M_PI/5)+((2*M_PI)/5)))/3, (sin(M_PI/5)+sin((M_PI/5)+((2*M_PI)/5)))/3, ((-sqrt(5)/2)-1)/3),
-                                      Vector3D::point((cos((M_PI/5)+((2*M_PI)/5))+cos((M_PI/5)+((4*M_PI)/5)))/3, (sin((M_PI/5)+((2*M_PI)/5))+sin((M_PI/5)+((4*M_PI)/5)))/3, ((-sqrt(5)/2)-1)/3),
-                                      Vector3D::point((cos((M_PI/5)+((4*M_PI)/5))+cos((M_PI/5)+((6*M_PI)/5)))/3, (sin((M_PI/5)+((4*M_PI)/5))+sin((M_PI/5)+((6*M_PI)/5)))/3, ((-sqrt(5)/2)-1)/3),
-                                      Vector3D::point((cos((M_PI/5)+((6*M_PI)/5))+cos((M_PI/5)+((8*M_PI)/5)))/3, (sin((M_PI/5)+((6*M_PI)/5))+sin((M_PI/5)+((8*M_PI)/5)))/3, ((-sqrt(5)/2)-1)/3),
-                                      Vector3D::point((cos(M_PI/5)+cos((M_PI/5)+((8*M_PI)/5)))/3, (sin(M_PI/5)+sin((M_PI/5)+((8*M_PI)/5)))/3, ((-sqrt(5)/2)-1)/3)};
-        */
         double x, y, z;
         for (int i = 0; i < 20; ++i){
             auto& points = icosahedronFigure->faces[i].pointIndexes;

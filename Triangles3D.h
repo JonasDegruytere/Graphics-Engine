@@ -1,5 +1,5 @@
 //
-// Created by Jonas on 15-5-2023.
+// Created by Jonas
 //
 
 #ifndef ENGINE_TRIANGLES3D_H
