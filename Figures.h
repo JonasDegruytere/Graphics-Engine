@@ -10,11 +10,6 @@ using namespace std;
 
 class Figures {
 public:
-    static Figure* cubeFigure;
-    static Figure* tetrahedronFigure;
-    static Figure* octahedronFigure;
-    static Figure* icosahedronFigure;
-    static Figure* dodecahedronFigure;
     Figures();
     static Figure getCubeFigure();
 
