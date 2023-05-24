@@ -95,21 +95,26 @@ Figure createEyeFigure(const ini::Configuration &configuration, string &figureNa
     return fig;
 }
 
-Figure createCube(const ini::Configuration &configuration, string &figureName, Matrix &V) {
+static Matrix genericInit(const ini::Configuration &configuration, string &figureName, Matrix &V){
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
     const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
     const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
     const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
-    vector<double> color;
-    color = configuration[figureName]["color"].as_double_tuple_or_die();
 
     Matrix S = Transformation::scaleFigure(scale);
+    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
     Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
     Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
     Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
     Matrix F = S * rX * rY * rZ * T * V;
+    return F;
+}
+
+Figure createCube(const ini::Configuration &configuration, string &figureName, Matrix &V) {
+    vector<double> color;
+    color = configuration[figureName]["color"].as_double_tuple_or_die();
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getCubeFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -119,20 +124,9 @@ Figure createCube(const ini::Configuration &configuration, string &figureName, M
 }
 
 Figure createTetrahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
-    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getTetrahedronFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -142,20 +136,9 @@ Figure createTetrahedron(const ini::Configuration &configuration, string &figure
 }
 
 Figure createOctahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
-    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getOctahedronFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -165,20 +148,9 @@ Figure createOctahedron(const ini::Configuration &configuration, string &figureN
 }
 
 Figure createIcosahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
-    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getIcosahedronFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -188,20 +160,9 @@ Figure createIcosahedron(const ini::Configuration &configuration, string &figure
 }
 
 Figure createDodecahedron(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
-    vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getDodecahedronFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -211,21 +172,11 @@ Figure createDodecahedron(const ini::Configuration &configuration, string &figur
 }
 
 Figure createSphere(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
     const unsigned int n = configuration[figureName]["n"].as_int_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig = Figures::getIcosahedronFigure();
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -239,22 +190,12 @@ Figure createSphere(const ini::Configuration &configuration, string &figureName,
 }
 
 Figure createCone(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
     const int n = configuration[figureName]["n"].as_int_or_die();
     const double height = configuration[figureName]["height"].as_double_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -276,22 +217,12 @@ Figure createCone(const ini::Configuration &configuration, string &figureName, M
 }
 
 Figure createCylinder(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
     const int n = configuration[figureName]["n"].as_int_or_die();
     const double height = configuration[figureName]["height"].as_double_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
@@ -320,10 +251,6 @@ Figure createCylinder(const ini::Configuration &configuration, string &figureNam
 }
 
 Figure createTorus(const ini::Configuration &configuration, string &figureName, Matrix &V) {
-    const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
-    const double rotateY = configuration[figureName]["rotateY"].as_double_or_die();
-    const double rotateZ = configuration[figureName]["rotateZ"].as_double_or_die();
-    const double scale = configuration[figureName]["scale"].as_double_or_die();
     vector<double> center = configuration[figureName]["center"].as_double_tuple_or_die();
     vector<double> color;
     color = configuration[figureName]["color"].as_double_tuple_or_die();
@@ -331,13 +258,7 @@ Figure createTorus(const ini::Configuration &configuration, string &figureName, 
     const int m = configuration[figureName]["m"].as_int_or_die();
     const double R = configuration[figureName]["R"].as_double_or_die();
     const double r = configuration[figureName]["r"].as_double_or_die();
-
-    Matrix S = Transformation::scaleFigure(scale);
-    Matrix rX = Transformation::rotateX((rotateX*M_PI)/180);
-    Matrix rY = Transformation::rotateY((rotateY*M_PI)/180);
-    Matrix rZ = Transformation::rotateZ((rotateZ*M_PI)/180);
-    Matrix T = Transformation::translate(Vector3D::point(center[0], center[1], center[2]));
-    Matrix F = S * rX * rY * rZ * T * V;
+    Matrix F = genericInit(configuration, figureName, V);
 
     Figure fig;
     fig.drawColor = Color(color[0],color[1],color[2]);
