@@ -160,7 +160,15 @@ void toAddEmpty(Figure &fig, int &indexCounter, vector<Vector3D> &toAdd){
     fig.faces.push_back(newFace);
     toAdd.clear();
 }
-
+void addPoint(Vector3D &point, vector<Vector3D> vec, double angle){
+    Vector3D H = Vector3D::vector(1, 0, 0);
+    Vector3D L = Vector3D::vector(0, 1, 0);
+    Vector3D U = Vector3D::vector(0, 0, 1);
+    H = (H*cos(angle)) + (L*sin(angle));
+    L = (L*cos(angle)) - point;
+    vec.push_back(H);
+    vec.push_back(L);
+}
 Figure System3DL::LSystem3D(const ini::Configuration &configuration, const string &figureName, Matrix &V, bool transform) {
 
     const double rotateX = configuration[figureName]["rotateX"].as_double_or_die();
@@ -195,6 +203,7 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
     Vector3D H = Vector3D::vector(1, 0, 0);
     Vector3D L = Vector3D::vector(0, 1, 0);
     Vector3D U = Vector3D::vector(0, 0, 1);
+    vector<Vector3D> points;
     stack<Vector3D> pointStack;
     stack<Vector3D> HStack;
     stack<Vector3D> LStack;
@@ -208,7 +217,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
-            auto temp = H * sin(angle);
+            auto temp = H;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             H = (H*cos(angle)) + (L*sin(angle));
             L = (L*cos(angle)) - (tempH*sin(angle));
             continue;
@@ -218,7 +229,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
-            auto temp = H * sin(angle);
+            auto temp = H;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             H = (H*cos(-angle)) + (L*sin(-angle));
             L = (L*cos(-angle)) - (tempH*sin(-angle));
             continue;
@@ -228,7 +241,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
-            auto temp = H * sin(angle);
+            auto temp = H;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             H = (H*cos(angle)) + (U*sin(angle));
             U = (U*cos(angle)) - (tempH*sin(angle));
             continue;
@@ -238,7 +253,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempH(H);
-            auto temp = H * sin(angle);
+            auto temp = H;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             H = (H*cos(-angle)) + (U*sin(-angle));
             U = (U*cos(-angle)) - (tempH*sin(-angle));
             continue;
@@ -248,7 +265,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempL(L);
-            auto temp = L * sin(angle);
+            auto temp = L;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             L = (L*cos(angle)) - (U*sin(angle));
             U = (tempL*sin(angle)) + (U*cos(angle));
             continue;
@@ -258,7 +277,9 @@ Figure System3DL::LSystem3D(const ini::Configuration &configuration, const strin
                 toAddEmpty(fig, indexCounter, toAdd);
             }
             Vector3D tempL(L);
-            auto temp = L * sin(angle);
+            auto temp = L;
+            temp *= sin(angle);
+            addPoint(temp,points, angle);
             L = (L*cos(-angle)) - (U*sin(-angle));
             U = (tempL*sin(-angle)) + (U*cos(-angle));
             continue;

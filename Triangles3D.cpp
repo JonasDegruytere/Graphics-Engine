@@ -6,7 +6,7 @@
 
 img::EasyImage Triangles3D::zBuffer(const ini::Configuration &configuration) {
     Figures3D figures;
-
+    double width, height, d, dx, dy;
     const unsigned int size = configuration["General"]["size"].as_int_or_die();
     vector<double> backgroundColor = configuration["General"]["backgroundcolor"].as_double_tuple_or_die();
     img::Color backgroundColorElement(backgroundColor[0] * 255, backgroundColor[1] * 255, backgroundColor[2] * 255);
@@ -35,7 +35,6 @@ img::EasyImage Triangles3D::zBuffer(const ini::Configuration &configuration) {
     }
 
     Lines2D projection = doProjectionConst(figures);
-    double width, height, d, dx, dy;
     Transformation::calculateValues(projection, size, width, height, d, dx, dy);
     img::EasyImage image(lround(width), lround(height), backgroundColorElement);
     ZBuffer buffer(image.get_width(), image.get_height());
